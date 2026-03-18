@@ -16,7 +16,13 @@ class SolapurSafetyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(
+  create: (_) {
+    final appState = AppState();
+    appState.startSocket(); // ✅ START HERE
+    return appState;
+  },
+),
       ],
       child: MaterialApp(
         title: 'Solapur Safety',

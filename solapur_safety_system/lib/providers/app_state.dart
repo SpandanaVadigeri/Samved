@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../models/device_state.dart';
 import '../models/sensor_data.dart';
+import '../services/socket_service.dart';
+
 
 enum AlertSeverity { info, warning, critical }
 
@@ -21,6 +23,9 @@ class AlertMessage {
 }
 
 class AppState extends ChangeNotifier {
+  
+  final SocketService socketService = SocketService();
+  
   // Connected Devices
   final List<DeviceState> _devices = [];
   List<DeviceState> get devices => _devices;
@@ -98,4 +103,49 @@ class AppState extends ChangeNotifier {
     _currentRole = role;
     notifyListeners();
   }
+
+  // Add this method to your existing AppState class in app_state.dart
+
+void clearDevices() {
+  _devices.clear();
+  notifyListeners();
+}
+
+void startSocket() {
+  socketService.connect((data) {
+
+    // 🔥 Convert backend → model
+    _currentData = SensorData(
+      h2s: (data['h2s'] ?? 0).toDouble(),
+      ch4: (data['ch4'] ?? 0).toDouble(),
+      co: (data['co'] ?? 0).toDouble(),
+      o2: (data['o2'] ?? 0).toDouble(),
+    );
+
+    // 🔥 Update status
+    if (data['status'] == "DANGER") {
+      _overallStatus = SafetyStatus.block;
+
+      addAlert(AlertMessage(
+        id: DateTime.now().toString(),
+        message: "Danger! Gas levels critical",
+        severity: AlertSeverity.critical,
+      ));
+
+    } else if (data['status'] == "CAUTION") {
+      _overallStatus = SafetyStatus.caution;
+
+      addAlert(AlertMessage(
+        id: DateTime.now().toString(),
+        message: "Caution! Gas levels rising",
+        severity: AlertSeverity.warning,
+      ));
+
+    } else {
+      _overallStatus = SafetyStatus.safe;
+    }
+
+    notifyListeners(); // 🔥 UI updates
+  });
+}
 }

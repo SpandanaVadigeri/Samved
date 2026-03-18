@@ -7,7 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.solapur_safety_system"
-    compileSdk = flutter.compileSdkVersion
+    // compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -24,8 +25,10 @@ android {
         applicationId = "com.example.solapur_safety_system"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // minSdk = flutter.minSdkVersion
+        // targetSdk = flutter.targetSdkVersion
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
