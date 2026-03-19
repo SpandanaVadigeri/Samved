@@ -79,9 +79,10 @@ app.use((req, res, next) => {
 // app.use('/api/alerts', authenticateToken, alertsRouter);
 // app.use('/api/sync', authenticateToken, syncRouter);
 
+
+const fs = require('fs'); // For storing logs in files
 app.post('/api/simulator', (req, res) => {
   const data = req.body;
-
   console.log("📡 Simulator Data Received:", data);
 
   // 🚨 ALERT LOGIC
@@ -102,8 +103,12 @@ app.post('/api/simulator', (req, res) => {
 
   // Send to frontend
   req.io.emit('sensor-data', response);
-
   res.json(response);
+
+  fs.appendFileSync('data.csv',JSON.stringify(data) + '\n');
+  req.io.emit('sensor-data', data);
+  res.json({message: "Data received"});
+
 });
 // Health check endpoint
 app.get('/health', (req, res) => {
